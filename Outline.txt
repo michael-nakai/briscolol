@@ -1,0 +1,11 @@
+Valid suits:
+    Cl   -   Clubs
+    Cu   -   Cups
+    Co   -   Coins
+    Sw   -   Swords
+
+Card numbers:
+    1-7  -   As stated, value variable (11 for 1, 10 for 3, 0 for all others)
+    8    -   Queen, value 2
+    9    -   Jack (dude on horse), value 3
+    10   -   King, value 4
