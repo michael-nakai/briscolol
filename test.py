@@ -9,6 +9,6 @@ e = AI.randy_random()
 f = AI.randy_random()
 g = AI.little_opportunist()
 h = AI.little_opportunist()
-y = [] # Add your new AI here
+y = [a, c, e, g] # Add your new AI here
 z = [b, d, f, h]
-main_pipeline(y, z, 100000)
+main_pipeline(y, z, 1000)

@@ -1,4 +1,4 @@
-import game_auto, itertools, AI
+import game_auto, itertools, AI, analysis, os
 from multiprocessing import Pool
 
 ### Helpers
@@ -23,7 +23,15 @@ def output_human_tsv(result_list, AI_name1, AI_name2):
         else:
             ties += 1
 
-    filename = AI_name1 + "_vs_" + AI_name2 + ".tsv"
+    try:
+        os.mkdir("Raw_tsvs")
+    except:
+        pass
+    if os.name == 'nt':
+        filename = "Raw_tsvs\\" + AI_name1 + "_vs_" + AI_name2 + ".tsv"
+    else:
+        filename = "Raw_tsvs/" + AI_name1 + "_vs_" + AI_name2 + ".tsv"
+
     output_file = open(filename, 'w')
     output_file.write("Game number\tWinner\tPlayer 1 Score\tPlayer 2 Score\n")
     game_number = 1
@@ -39,7 +47,15 @@ def output_human_tsv(result_list, AI_name1, AI_name2):
 
 def output_results_for_machine(result_list, AI_name1, AI_name2):
 
-    filename = AI_name1 + "_vs_" + AI_name2 + "_machine_readable.txt"
+    try:
+        os.mkdir("Machine_data")
+    except:
+        pass
+    if os.name == 'nt':
+        filename = "Machine_data\\" + AI_name1 + "_vs_" + AI_name2 + ".tsv"
+    else:
+        filename = "Machine_data/" + AI_name1 + "_vs_" + AI_name2 + ".tsv"
+        
     output_file = open(filename, 'w')
     output_file.write(str(result_list))
     output_file.write("\n")
@@ -49,7 +65,7 @@ def output_results_for_machine(result_list, AI_name1, AI_name2):
     output_file.close()
 
 
-### Main function to run
+### Main functions to run
 
 def main_pipeline(AI_list1, AI_list2, rounds_per_matchup = 1000):
     AI_list_names1 = []
@@ -61,14 +77,23 @@ def main_pipeline(AI_list1, AI_list2, rounds_per_matchup = 1000):
     print("Starting the simulation pipeline with the AIs:", ", ".join(list(set(AI_list_names1 + AI_list_names2))))
 
     all_possible_combinations = list(itertools.product(AI_list1, AI_list2))
+    list_of_result_lists = []
     for matchup in all_possible_combinations:
         print("\nStarting to simulate " + str(matchup[0].AI_name()) + " vs " + str(matchup[1].AI_name()))
         result_list = simulate_games(matchup[0], matchup[1], rounds_per_matchup)
         print("\tFinished simulating games, now exporting...")
         output_human_tsv(result_list, matchup[0].AI_name(), matchup[1].AI_name())
         output_results_for_machine(result_list, matchup[0].AI_name(), matchup[1].AI_name())
+        result_list.append(matchup[1].AI_name())
+        result_list.append(matchup[0].AI_name())
+        list_of_result_lists.append(result_list)
     
-    print("\nFinished simulating all matchups")
+    print("\nFinished simulating all matchups, starting analysis")
+
+    analysis.tabulate_results(list_of_result_lists)
+    print("\n Finished analysis")
+    
+    
 
 
 
@@ -94,4 +119,4 @@ def main_pipeline_speed(AI_list1, AI_list2, rounds_per_matchup = 1000):
     pool.starmap(sub_simulate, zip(all_possible_combinations, itertools.repeat(rounds_per_matchup)))
     pool.close()
     
-    print("\nFinished simulating all matchups")
+    print("\n\tFinished simulating all matchups")
